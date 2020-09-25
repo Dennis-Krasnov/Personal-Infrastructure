@@ -11,7 +11,6 @@
 ```bash
 # Start local cluster
 minikube start --driver=virtualbox
-# minikube addons enable ingress (this starts nginx)
 
 # Install Argo CD
 kubectl create namespace argocd
@@ -19,13 +18,15 @@ kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/st
 
 # Log into Argo CD
 ARGOCD_PASSWORD=$(kubectl get pods -n argocd -l app.kubernetes.io/name=argocd-server -o name | cut -d'/' -f 2)
-argocd login $ARGOCD_PASSWORD
-argocd account update-password # TODO
+# ANOTHER TAB: kubectl port-forward svc/argocd-server -n argocd 8080:443
+argocd login localhost:8080 --username admin --password $ARGOCD_PASSWORD
+argocd account update-password
 
 # Bootstrap cluster
-argocd app create guestbook --repo https://github.com/Dennis-Krasnov/Personal-Infrastructure.git --path bootstrap --dest-server https://kubernetes.default.svc --dest-namespace default
-argocd app get guestbook
-argocd app sync guestbook
+argocd app create bootstrap --repo https://github.com/Dennis-Krasnov/Personal-Infrastructure.git --path bootstrap --dest-server https://kubernetes.default.svc --dest-namespace default
+argocd app get bootstrap
+argocd app sync bootstrap
+argocd app wait guestbook
 
 # Configure private image repository # TODO: move before install argo # TODO: figure out how this works with minikube
 # https://www.digitalocean.com/docs/images/container-registry/how-to/use-registry-docker-kubernetes/
@@ -42,21 +43,35 @@ kubectl config get-contexts
 kubectl config use-context do-tor1-personal
 ```
 
-# Minikube
+# Traefik
+kubectl port-forward $(kubectl get pods --selector "app.kubernetes.io/name=traefik" --output=name) 9000:9000
 
+# ArgoCD
+# TODO: create ingress route for this!
+
+# Minikube
 ```bash
 minikube dashboard
 minikube status
 minikube stop
 minikube addons list
+minikube cache list
 ```
 
-# Traefik
-kubectl port-forward $(kubectl get pods --selector "app.kubernetes.io/name=traefik" --output=name) 9000:9000
+## Metrics
+```
+minikube addons enable metrics-server
+kubectl top nodes
+kubectl top pods # -A OR -n <namespace>
+```
 
-# ArgoCD
-# Dashboard: kubectl port-forward svc/argocd-server -n argocd 8080:443
-# TODO: create ingress route for this!
+## Cache
+ctrl-f `image:` on https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
+```bash
+minikube cache add argoproj/argocd:v1.7.6
+# minikube cache add quay.io/dexidp/dex:v2.22.0 (doesn't work...)
+minikube cache add redis:5.0.8
+```
 
 # random stuff
 
