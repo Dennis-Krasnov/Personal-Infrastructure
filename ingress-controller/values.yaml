@@ -1,0 +1,4 @@
+# https://github.com/traefik/traefik-helm-chart/blob/master/traefik/values.yaml
+traefik:
+  deployment:
+    enabled: true

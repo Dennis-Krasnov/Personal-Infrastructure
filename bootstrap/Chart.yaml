@@ -1,0 +1,11 @@
+apiVersion: v2
+name: bootstrap
+version: 0.1.0
+
+description: Bootstrap personal kubernetes cluster using Argo CD
+home: https://admin.krasnov.dev
+sources:
+  - https://github.com/Dennis-Krasnov/Personal-Infrastructure
+maintainers:
+  - name: Dennis Krasnov
+    url: https://krasnov.dev
