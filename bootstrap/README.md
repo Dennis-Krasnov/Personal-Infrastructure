@@ -16,24 +16,32 @@ minikube start --driver=virtualbox
 kubectl create namespace argocd
 kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
 
+# Wait until Argo CD starts...
+
 # Log into Argo CD
 ARGOCD_PASSWORD=$(kubectl get pods -n argocd -l app.kubernetes.io/name=argocd-server -o name | cut -d'/' -f 2)
 # ANOTHER TAB: kubectl port-forward svc/argocd-server -n argocd 8080:443
-argocd login localhost:8080 --username admin --password $ARGOCD_PASSWORD
+argocd login localhost:8080 --username admin --password $ARGOCD_PASSWORD # yes
 argocd account update-password
 
 # Bootstrap cluster
 argocd app create bootstrap --repo https://github.com/Dennis-Krasnov/Personal-Infrastructure.git --path bootstrap --dest-server https://kubernetes.default.svc --dest-namespace default
-argocd app get bootstrap
+# argocd app get bootstrap
 argocd app sync bootstrap
-argocd app wait guestbook
+# argocd app wait guestbook
+
+argocd app sync ingress-controller
+# TODO: and other apps that I need
+
+# Tunnel to load balancer service
+# minikube service ingress-controller-traefik -n ingress-controller
+
+sudo nano /etc/hosts # add: <ip> argocd.example.com
 
 # Configure private image repository # TODO: move before install argo # TODO: figure out how this works with minikube
 # https://www.digitalocean.com/docs/images/container-registry/how-to/use-registry-docker-kubernetes/
 doctl registry kubernetes-manifest | kubectl apply -f -
 kubectl patch serviceaccount default -p '{"imagePullSecrets": [{"name": "registry-krasnov"}]}'
-
-# minikube service <load-balancer-service>
 
 # Delete local cluster
 minikube delete
@@ -56,6 +64,7 @@ minikube status
 minikube stop
 minikube addons list
 minikube cache list
+minikube service list
 ```
 
 ## Metrics
