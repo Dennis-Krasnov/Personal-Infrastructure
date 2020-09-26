@@ -11,13 +11,14 @@
 ```bash
 # Start local cluster
 minikube start --driver=virtualbox
+# minikube addons enable ingress # FIXME
 
 # Install Argo CD
 kubectl create namespace argocd
 kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
 
 # Wait until Argo CD starts
-watch -n10 -d "kubectl get pods -A"
+watch -n5 -d "kubectl get pods -A"
 
 # Log into Argo CD
 ARGOCD_PASSWORD=$(kubectl get pods -n argocd -l app.kubernetes.io/name=argocd-server -o name | cut -d'/' -f 2)
