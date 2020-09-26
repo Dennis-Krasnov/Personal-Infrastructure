@@ -28,13 +28,9 @@ argocd account update-password
 # Bootstrap cluster
 argocd app create bootstrap --repo https://github.com/Dennis-Krasnov/Personal-Infrastructure.git --path bootstrap --dest-server https://kubernetes.default.svc --dest-namespace default
 argocd app sync bootstrap
-# argocd app wait guestbook
-
 argocd app sync ingress-controller
 # TODO: and other apps that I need
 
-# Tunnel to load balancer service
-# minikube service ingress-controller-traefik -n ingress-controller
 # ANOTHER TAB: minikube tunnel
 
 sudo nano /etc/hosts # add: <ip> argocd.example.com
