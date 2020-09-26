@@ -22,7 +22,7 @@ watch -n10 -d "kubectl get pods -A"
 # Log into Argo CD
 ARGOCD_PASSWORD=$(kubectl get pods -n argocd -l app.kubernetes.io/name=argocd-server -o name | cut -d'/' -f 2)
 # ANOTHER TAB: kubectl port-forward svc/argocd-server -n argocd 8080:443
-argocd login localhost:8080 --username admin --password $ARGOCD_PASSWORD # yes
+echo y | argocd login localhost:8080 --username admin --password $ARGOCD_PASSWORD
 argocd account update-password
 
 # Bootstrap cluster
