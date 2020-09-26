@@ -16,7 +16,8 @@ minikube start --driver=virtualbox
 kubectl create namespace argocd
 kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
 
-# Wait until Argo CD starts...
+# Wait until Argo CD starts
+watch -n10 -d "kubectl get pods -A"
 
 # Log into Argo CD
 ARGOCD_PASSWORD=$(kubectl get pods -n argocd -l app.kubernetes.io/name=argocd-server -o name | cut -d'/' -f 2)
@@ -26,7 +27,6 @@ argocd account update-password
 
 # Bootstrap cluster
 argocd app create bootstrap --repo https://github.com/Dennis-Krasnov/Personal-Infrastructure.git --path bootstrap --dest-server https://kubernetes.default.svc --dest-namespace default
-# argocd app get bootstrap
 argocd app sync bootstrap
 # argocd app wait guestbook
 
@@ -35,6 +35,7 @@ argocd app sync ingress-controller
 
 # Tunnel to load balancer service
 # minikube service ingress-controller-traefik -n ingress-controller
+# ANOTHER TAB: minikube tunnel
 
 sudo nano /etc/hosts # add: <ip> argocd.example.com
 
