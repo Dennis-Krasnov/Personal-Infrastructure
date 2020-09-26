@@ -1,0 +1,19 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: sgbiotec
+  namespace: argocd
+  finalizers:
+  - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  source:
+    repoURL: {{ .Values.spec.source.repoURL }}
+    targetRevision: {{ .Values.spec.source.targetRevision }}
+    path: sgbiotec
+  destination:
+    server: {{ .Values.spec.destination.server }}
+    namespace: sgbiotec
+  syncPolicy:
+    syncOptions:
+      - CreateNamespace=true

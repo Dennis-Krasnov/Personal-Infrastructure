@@ -2,7 +2,7 @@ apiVersion: v2
 name: ingress-controller
 version: 0.1.0
 
-dependencies:
-  - name: traefik
-    version: 9.3.0
-    repository: https://helm.traefik.io/traefik
+# dependencies:
+#   - name: traefik
+#     version: 9.3.0
+#     repository: https://helm.traefik.io/traefik
