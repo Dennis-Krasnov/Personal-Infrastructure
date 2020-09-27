@@ -4,7 +4,7 @@ metadata:
   name: api
 spec:
   entryPoints:
-    - internal
+    - traefik
   routes:
   - match: Host(`traefik.denniskrasnov.com`)
     kind: Rule
