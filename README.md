@@ -21,13 +21,14 @@ VBoxManage modifyvm minikube --natdnshostresolver1 off
 minikube start --driver=virtualbox --cpus 4 --memory 8192
 
 # Create secrets
-kubectl create secret generic traefik -n ingress-controller \ 
-  --from-literal="DO_AUTH_TOKEN=$(cat ~/.secrets/digital_ocean/traefik_kubernetes_pat.txt | tr -d '\n')"
-kubectl get secret traefik -o jsonpath="{.data.DO_AUTH_TOKEN}" | base64 --decode
+kubectl create namespace ingress-controller
+kubectl -n ingress-controller create secret generic traefik --from-literal="DO_AUTH_TOKEN=$(cat ~/.secrets/digital_ocean/traefik_kubernetes_pat.txt | tr -d '\n')"
+kubectl -n ingress-controller get secret traefik -o jsonpath="{.data.DO_AUTH_TOKEN}" | base64 --decode
 
 # Install Argo CD
 kubectl create namespace argocd
-kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
+kubectl apply -n argocd -f argocd-install.yaml
+kubectl apply -n argocd -f argocd-dashboard-ingress.yaml
 
 # Wait until Argo CD starts
 watch -n5 -d "kubectl get pods -A"
@@ -50,8 +51,11 @@ argocd app sync ingress-controller
 
 # Sync specific apps
 argocd app sync sgbiotec
+argocd app wait sgbiotec
 
-sudo nano /etc/hosts # add: <lb-external-ip> argocd.example.com
+# Update /etc/hosts
+LOAD_BALANCER_IP=$(kgs -n ingress-controller ingress-controller-traefik -o json | jq -r ".status.loadBalancer.ingress[0].ip")
+sudo nano /etc/hosts # add: <LOAD_BALANCER_IP> argocd.example.com
 
 # Configure private image repository # TODO: move before install argo # TODO: figure out how this works with minikube
 # https://www.digitalocean.com/docs/images/container-registry/how-to/use-registry-docker-kubernetes/
