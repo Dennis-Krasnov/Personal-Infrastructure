@@ -10,5 +10,11 @@ spec:
     kind: Rule
     middlewares:
       - name: portfolio-redirect
+  - match: Host(`krasnov.dev`)
+    kind: Rule
+    services:
+    - name: portfolio-web
+      namespace: portfolio
+      port: 80
   tls:
     certResolver: letsencrypt

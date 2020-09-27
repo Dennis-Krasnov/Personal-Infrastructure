@@ -34,10 +34,9 @@ virt-host-validate
 # minikube start --driver=virtualbox --cpus 4 --memory 8192
 minikube addons enable ingress
 
-# Fix virtual box DNS
-# minikube stop
-# VBoxManage modifyvm minikube --natdnshostresolver1 off
-# minikube start --driver=virtualbox --cpus 4 --memory 8192
+# Configure private image repository - https://www.digitalocean.com/docs/images/container-registry/how-to/use-registry-docker-kubernetes/
+doctl registry kubernetes-manifest | kubectl apply -f -
+kubectl patch serviceaccount default -p '{"imagePullSecrets": [{"name": "registry-krasnov"}]}'
 
 # Create secrets
 kubectl create namespace ingress-controller
@@ -75,11 +74,6 @@ argocd app wait sgbiotec
 # Update /etc/hosts
 LOAD_BALANCER_IP=$(kgs -n ingress-controller ingress-controller-traefik -o json | jq -r ".status.loadBalancer.ingress[0].ip")
 sudo nano /etc/hosts # add: <LOAD_BALANCER_IP> argocd.example.com
-
-# Configure private image repository # TODO: move before install argo # TODO: figure out how this works with minikube
-# https://www.digitalocean.com/docs/images/container-registry/how-to/use-registry-docker-kubernetes/
-doctl registry kubernetes-manifest | kubectl apply -f -
-kubectl patch serviceaccount default -p '{"imagePullSecrets": [{"name": "registry-krasnov"}]}'
 
 # Delete local cluster
 minikube delete
