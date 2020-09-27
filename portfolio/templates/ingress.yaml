@@ -1,0 +1,16 @@
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: portfolio-ingress
+spec:
+  entryPoints:
+    - websecure
+  routes:
+  - match: Host(`krasnov.dev`)
+    kind: Rule
+    services:
+    - name: portfolio-web
+      namespace: portfolio
+      port: 80
+  tls:
+    certResolver: letsencrypt

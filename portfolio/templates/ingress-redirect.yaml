@@ -1,0 +1,14 @@
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: portfolio-redirect-ingress
+spec:
+  entryPoints:
+    - websecure
+  routes:
+  - match: Host(`denniskrasnov.com`)
+    kind: Rule
+    middlewares:
+      - name: portfolio-redirect
+  tls:
+    certResolver: letsencrypt

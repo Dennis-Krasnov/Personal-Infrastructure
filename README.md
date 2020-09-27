@@ -1,24 +1,43 @@
 # Prerequisites
-- Kubectl (yay -S ...)
-- Helm 3 (yay -S ... &&  helm repo add traefik https://helm.traefik.io/traefik && helm repo update)
-- Virtualbox (yay -S virtualbox virtualbox-host-dkms && reboot)
-- Minikube (yay -S minikube)
-- Doctl (yay -S doctl && doctl login)
-- ArgoCD (yay -S argocd-cli)
+## Kubernetes
+```bash
+yay -S kubectl helm argocd-cli
 
-TLS domains must exist on digital ocean ???? - no!
+helm repo add traefik https://helm.traefik.io/traefik
+helm repo update
+```
+
+## Digital Ocean
+```bash
+yay -S doctl
+doctl login
+```
+
+## Minikube and kvm2
+```bash
+yay -S minikube
+
+# https://gist.github.com/grugnog/caa118205ad498423266f26150a5d555
+yay -S libvirt qemu gnome-boxes ebtables docker-machine-driver-kvm2
+systemctl enable --now libvirtd.service
+sudo usermod -a -G libvirt $(whoami)
+sudo virsh net-autostart default
+reboot
+
+virt-host-validate
+```
 
 # Instructions
 
 ```bash
 # Start local cluster
-minikube start --driver=virtualbox --cpus 4 --memory 8192
+# minikube start --driver=virtualbox --cpus 4 --memory 8192
 minikube addons enable ingress
 
 # Fix virtual box DNS
-minikube stop
-VBoxManage modifyvm minikube --natdnshostresolver1 off
-minikube start --driver=virtualbox --cpus 4 --memory 8192
+# minikube stop
+# VBoxManage modifyvm minikube --natdnshostresolver1 off
+# minikube start --driver=virtualbox --cpus 4 --memory 8192
 
 # Create secrets
 kubectl create namespace ingress-controller
@@ -73,6 +92,7 @@ kubectl config use-context do-tor1-personal
 # Traefik
 # kubectl port-forward $(kubectl get pods --selector "app.kubernetes.io/name=traefik" --output=name) 9000:9000
 kubectl port-forward -n ingress-controller $(kubectl get pods -n ingress-controller --selector "app.kubernetes.io/name=traefik" --output=name) 9000:9000
+http://localhost:9000/dashboard/#/
 
 TODO: don't include let's encrypt staging for production
 

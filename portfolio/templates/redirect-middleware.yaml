@@ -1,0 +1,8 @@
+apiVersion: traefik.containo.us/v1alpha1
+kind: Middleware
+metadata:
+  name: portfolio-redirect
+spec:
+  redirectRegex:
+    regex: ^https://denniskrasnov.com/(.*)
+    replacement: https://krasnov.dev/${1}
