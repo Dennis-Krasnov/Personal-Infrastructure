@@ -17,11 +17,6 @@ traefik:
 
   # https://doc.traefik.io/traefik/reference/static-configuration/cli/
   additionalArguments:
-    # Dashboard
-    - "--api.insecure"
-    - "--api.debug"
-    - "--api.dashboard"
-
     # Logging
     - "--log.level=info"
     - "--accesslog"
