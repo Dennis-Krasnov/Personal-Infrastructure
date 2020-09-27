@@ -6,7 +6,7 @@
 - Doctl (yay -S doctl && doctl login)
 - ArgoCD (yay -S argocd-cli)
 
-TLS domains must exist on digital ocean!
+TLS domains must exist on digital ocean ???? - no!
 
 # Instructions
 
@@ -28,13 +28,12 @@ kubectl -n ingress-controller get secret traefik -o jsonpath="{.data.DO_AUTH_TOK
 # Install Argo CD
 kubectl create namespace argocd
 kubectl apply -n argocd -f argocd-install.yaml
-kubectl apply -n argocd -f argocd-dashboard-ingress.yaml
 
 # Wait until Argo CD starts
 watch -n5 -d "kubectl get pods -A"
 
 # Log into Argo CD
-# ANOTHER TAB: kubectl port-forward svc/argocd-server -n argocd 8088:443
+# ANOTHER TAB: kubectl port-forward svc/argocd-server -n argocd 8088:80
 ARGOCD_PASSWORD=$(kubectl get pods -n argocd -l app.kubernetes.io/name=argocd-server -o name | cut -d'/' -f 2)
 echo y | argocd login localhost:8088 --username admin --password $ARGOCD_PASSWORD
 argocd account update-password
@@ -48,6 +47,7 @@ argocd app create bootstrap \
   --dest-namespace default
 argocd app sync bootstrap
 argocd app sync ingress-controller
+kubectl apply -n argocd -f argocd-dashboard-ingress.yaml
 
 # Sync specific apps
 argocd app sync sgbiotec
@@ -71,7 +71,8 @@ kubectl config use-context do-tor1-personal
 ```
 
 # Traefik
-kubectl port-forward $(kubectl get pods --selector "app.kubernetes.io/name=traefik" --output=name) 9000:9000
+# kubectl port-forward $(kubectl get pods --selector "app.kubernetes.io/name=traefik" --output=name) 9000:9000
+kubectl port-forward $(kubectl get pods --selector "app.kubernetes.io/name=traefik" --output=name -n ingress-controller) 9000:9000 -n ingress-controller
 
 TODO: don't include let's encrypt staging for production
 

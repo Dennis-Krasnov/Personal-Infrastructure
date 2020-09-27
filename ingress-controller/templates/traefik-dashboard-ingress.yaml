@@ -1,0 +1,15 @@
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: api
+spec:
+  entryPoints:
+    - internal
+  routes:
+  - match: Host(`traefik.denniskrasnov.com`)
+    kind: Rule
+    # middlewares:
+    # - name: auth
+    services:
+    - name: api@internal
+      kind: TraefikService
