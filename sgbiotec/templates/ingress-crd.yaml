@@ -11,4 +11,5 @@ spec:
     kind: Rule
     services:
     - name: guestbook-ui
+      namespace: sgbiotec
       port: 8080
