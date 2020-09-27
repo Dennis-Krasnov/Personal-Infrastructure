@@ -6,6 +6,8 @@
 - Doctl (yay -S doctl && doctl login)
 - ArgoCD (yay -S argocd-cli)
 
+TLS domains must exist on digital ocean!
+
 # Instructions
 
 ```bash
@@ -13,14 +15,15 @@
 minikube start --driver=virtualbox --cpus 4 --memory 8192
 minikube addons enable ingress
 
-# Fix virtual box
-# minikube stop
-# VBoxManage modifyvm minikube --natdnshostresolver1 off
-# minikube start --driver=virtualbox --cpus 4 --memory 8192
+# Fix virtual box DNS
+minikube stop
+VBoxManage modifyvm minikube --natdnshostresolver1 off
+minikube start --driver=virtualbox --cpus 4 --memory 8192
 
 # Create secrets
-# kubectl create secret generic traefik --from-literal="DO_AUTH_TOKEN=$(cat ~/.secrets/digital_ocean/traefik_kubernetes_pat.txt | tr -d '\n')"
-# kubectl get secret traefik -o jsonpath="{.data.DO_AUTH_TOKEN}" | base64 --decode
+kubectl create secret generic traefik -n ingress-controller \ 
+  --from-literal="DO_AUTH_TOKEN=$(cat ~/.secrets/digital_ocean/traefik_kubernetes_pat.txt | tr -d '\n')"
+kubectl get secret traefik -o jsonpath="{.data.DO_AUTH_TOKEN}" | base64 --decode
 
 # Install Argo CD
 kubectl create namespace argocd
@@ -37,14 +40,18 @@ argocd account update-password
 
 # Bootstrap cluster
 # ANOTHER TAB: minikube tunnel
-argocd app create bootstrap --repo https://github.com/Dennis-Krasnov/Personal-Infrastructure.git --path bootstrap --dest-server https://kubernetes.default.svc --dest-namespace default
+argocd app create bootstrap \
+  --repo https://github.com/Dennis-Krasnov/Personal-Infrastructure.git \
+  --path bootstrap \
+  --dest-server https://kubernetes.default.svc \
+  --dest-namespace default
 argocd app sync bootstrap
+argocd app sync ingress-controller
 
 # Sync specific apps
-# ANOTHER TAB: kubectl port-forward --address 0.0.0.0 service/traefik 8000:8000 8080:8080 443:4443 -n default
 argocd app sync sgbiotec
 
-sudo nano /etc/hosts # add: <ip> argocd.example.com
+sudo nano /etc/hosts # add: <lb-external-ip> argocd.example.com
 
 # Configure private image repository # TODO: move before install argo # TODO: figure out how this works with minikube
 # https://www.digitalocean.com/docs/images/container-registry/how-to/use-registry-docker-kubernetes/
@@ -61,6 +68,9 @@ kubectl config use-context do-tor1-personal
 
 # Traefik
 kubectl port-forward $(kubectl get pods --selector "app.kubernetes.io/name=traefik" --output=name) 9000:9000
+
+TODO: don't include let's encrypt staging for production
+
 
 # ArgoCD
 # TODO: create ingress route for this!

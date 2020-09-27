@@ -1,0 +1,30 @@
+# https://github.com/traefik/traefik-helm-chart/blob/master/traefik/values.yaml
+traefik:
+  persistence:
+    enabled: true
+
+  env:
+  - name: DO_AUTH_TOKEN
+    valueFrom:
+      secretKeyRef:
+        name: traefik
+        key: DO_AUTH_TOKEN
+
+  # https://doc.traefik.io/traefik/reference/static-configuration/cli/
+  additionalArguments:
+    # Dashboard
+    - "--api.insecure"
+    - "--api.debug"
+    - "--api.dashboard"
+
+    # Logging
+    - "--log.level=info"
+    - "--accesslog"
+    - "--global.sendanonymoususage=false"
+
+    # TLS
+    - "--certificatesresolvers.letsencrypt.acme.email=dennis@krasnov.dev"
+    - "--certificatesresolvers.letsencrypt.acme.storage=data/acme.json"
+    - "--certificatesresolvers.letsencrypt.acme.dnschallenge"
+    - "--certificatesresolvers.letsencrypt.acme.dnschallenge.provider=digitalocean"
+    - "--certificatesresolvers.letsencrypt.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory"
