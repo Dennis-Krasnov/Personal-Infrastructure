@@ -7,7 +7,7 @@ spec:
     # - traefik
     - websecure
   routes:
-  - match: Host(`traefik.denniskrasnov.com`) && (PathPrefix(`/dashboard`) || PathPrefix(`/api`))
+  - match: Host(`traefik.denniskrasnov.com`)
     kind: Rule
     # middlewares:
     # - name: auth

@@ -72,7 +72,7 @@ kubectl config use-context do-tor1-personal
 
 # Traefik
 # kubectl port-forward $(kubectl get pods --selector "app.kubernetes.io/name=traefik" --output=name) 9000:9000
-kubectl port-forward $(kubectl get pods --selector "app.kubernetes.io/name=traefik" --output=name -n ingress-controller) 9000:9000 -n ingress-controller
+kubectl port-forward -n ingress-controller $(kubectl get pods -n ingress-controller --selector "app.kubernetes.io/name=traefik" --output=name) 9000:9000
 
 TODO: don't include let's encrypt staging for production
 
