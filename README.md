@@ -10,13 +10,13 @@
 
 ```bash
 # Start local cluster
-minikube start --driver=virtualbox
+minikube start --driver=virtualbox --cpus 4 --memory 8192
 minikube addons enable ingress
 
 # Create secrets
 kubectl create secret generic traefik \
   --from-file=DO_AUTH_TOKEN=/home/dennis/.secrets/digital_ocean/traefik_kubernetes_pat.txt
-kubectl get secrets -A
+kubectl get secrets
 
 # Install Argo CD
 kubectl create namespace argocd
