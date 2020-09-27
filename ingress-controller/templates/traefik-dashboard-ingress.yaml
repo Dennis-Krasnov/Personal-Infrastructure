@@ -1,12 +1,12 @@
 apiVersion: traefik.containo.us/v1alpha1
 kind: IngressRoute
 metadata:
-  name: api
+  name: traefik-dashboard
 spec:
   entryPoints:
     - traefik
   routes:
-  - match: Host(`traefik.denniskrasnov.com`)
+  - match: Host(`traefik.denniskrasnov.com`) && (PathPrefix(`/dashboard`) || PathPrefix(`/api`))
     kind: Rule
     # middlewares:
     # - name: auth
