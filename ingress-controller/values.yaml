@@ -27,4 +27,4 @@ traefik:
     - "--certificatesresolvers.letsencrypt.acme.storage=data/acme.json"
     - "--certificatesresolvers.letsencrypt.acme.dnschallenge"
     - "--certificatesresolvers.letsencrypt.acme.dnschallenge.provider=digitalocean"
-    - "--certificatesresolvers.letsencrypt.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory"
+    # - "--certificatesresolvers.letsencrypt.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory"
