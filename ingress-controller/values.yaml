@@ -4,9 +4,9 @@ traefik:
     enabled: true
     # storageClass: ""
 
-  ingressRoute:
-    dashboard:
-      enabled: false
+  # ingressRoute:
+  #   dashboard:
+  #     enabled: false
 
   env:
   - name: DO_AUTH_TOKEN
