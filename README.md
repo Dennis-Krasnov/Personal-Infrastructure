@@ -13,10 +13,14 @@
 minikube start --driver=virtualbox --cpus 4 --memory 8192
 minikube addons enable ingress
 
+# Fix virtual box
+# minikube stop
+# VBoxManage modifyvm minikube --natdnshostresolver1 off
+# minikube start --driver=virtualbox --cpus 4 --memory 8192
+
 # Create secrets
-kubectl create secret generic traefik \
-  --from-file=DO_AUTH_TOKEN=/home/dennis/.secrets/digital_ocean/traefik_kubernetes_pat.txt
-kubectl get secrets
+# kubectl create secret generic traefik --from-literal="DO_AUTH_TOKEN=$(cat ~/.secrets/digital_ocean/traefik_kubernetes_pat.txt | tr -d '\n')"
+# kubectl get secret traefik -o jsonpath="{.data.DO_AUTH_TOKEN}" | base64 --decode
 
 # Install Argo CD
 kubectl create namespace argocd
@@ -26,19 +30,19 @@ kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/st
 watch -n5 -d "kubectl get pods -A"
 
 # Log into Argo CD
+# ANOTHER TAB: kubectl port-forward svc/argocd-server -n argocd 8088:443
 ARGOCD_PASSWORD=$(kubectl get pods -n argocd -l app.kubernetes.io/name=argocd-server -o name | cut -d'/' -f 2)
-# ANOTHER TAB: kubectl port-forward svc/argocd-server -n argocd 8080:443
-echo y | argocd login localhost:8080 --username admin --password $ARGOCD_PASSWORD
+echo y | argocd login localhost:8088 --username admin --password $ARGOCD_PASSWORD
 argocd account update-password
 
 # Bootstrap cluster
+# ANOTHER TAB: minikube tunnel
 argocd app create bootstrap --repo https://github.com/Dennis-Krasnov/Personal-Infrastructure.git --path bootstrap --dest-server https://kubernetes.default.svc --dest-namespace default
 argocd app sync bootstrap
 
 # Sync specific apps
+# ANOTHER TAB: kubectl port-forward --address 0.0.0.0 service/traefik 8000:8000 8080:8080 443:4443 -n default
 argocd app sync sgbiotec
-
-# ANOTHER TAB: minikube tunnel
 
 sudo nano /etc/hosts # add: <ip> argocd.example.com
 

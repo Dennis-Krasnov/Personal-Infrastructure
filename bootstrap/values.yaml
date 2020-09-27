@@ -10,12 +10,12 @@ traefik:
   persistence:
     enabled: true
 
-  env:
-  - name: DO_AUTH_TOKEN
-    valueFrom:
-      secretKeyRef:
-        name: traefik
-        key: DO_AUTH_TOKEN
+  # env:
+  # - name: DO_AUTH_TOKEN
+  #   valueFrom:
+  #     secretKeyRef:
+  #       name: traefik
+  #       key: DO_AUTH_TOKEN
 
   # https://doc.traefik.io/traefik/reference/static-configuration/cli/
   additionalArguments:
@@ -32,8 +32,8 @@ traefik:
     # TLS
     - "--certificatesresolvers.letsencrypt.acme.email=dennis@krasnov.dev"
     - "--certificatesresolvers.letsencrypt.acme.storage=data/acme.json"
-    # - "--certificatesresolvers.letsencrypt.acme.tlschallenge"
-    - "--certificatesresolvers.letsencrypt.acme.dnschallenge"
-    - "--certificatesresolvers.letsencrypt.acme.dnschallenge.provider=digitalocean"
+    - "--certificatesresolvers.letsencrypt.acme.tlschallenge"
+    # - "--certificatesresolvers.letsencrypt.acme.dnschallenge"
+    # - "--certificatesresolvers.letsencrypt.acme.dnschallenge.provider=digitalocean"
     # COMMENT THIS OUT FOR PRODUCTION
     # - "--certificatesresolvers.letsencrypt.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory"
