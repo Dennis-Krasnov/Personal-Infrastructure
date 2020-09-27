@@ -14,6 +14,6 @@ spec:
     spec:
       containers:
       - name: nginx
-        image: registry.digitalocean.com/krasnov/portfolio-web:63
+        image: registry.digitalocean.com/krasnov/portfolio-web:alpha
         ports:
         - containerPort: 80
