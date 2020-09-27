@@ -13,7 +13,7 @@ spec:
     path: ingress-controller
   destination:
     server: {{ .Values.spec.destination.server }}
-    namespace: ingress-controller
+    namespace: kube-system
   syncPolicy:
     syncOptions:
       - CreateNamespace=true

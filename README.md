@@ -11,7 +11,12 @@
 ```bash
 # Start local cluster
 minikube start --driver=virtualbox
-# minikube addons enable ingress # FIXME
+minikube addons enable ingress
+
+# Create secrets
+kubectl create secret generic traefik \
+  --from-file=DO_AUTH_TOKEN=/home/dennis/.secrets/digital_ocean/traefik_kubernetes_pat.txt
+kubectl get secrets -A
 
 # Install Argo CD
 kubectl create namespace argocd
@@ -29,8 +34,9 @@ argocd account update-password
 # Bootstrap cluster
 argocd app create bootstrap --repo https://github.com/Dennis-Krasnov/Personal-Infrastructure.git --path bootstrap --dest-server https://kubernetes.default.svc --dest-namespace default
 argocd app sync bootstrap
-argocd app sync ingress-controller
-# TODO: and other apps that I need
+
+# Sync specific apps
+argocd app sync sgbiotec
 
 # ANOTHER TAB: minikube tunnel
 
@@ -59,6 +65,7 @@ kubectl port-forward $(kubectl get pods --selector "app.kubernetes.io/name=traef
 ```bash
 minikube dashboard
 minikube status
+minikube logs
 minikube stop
 minikube addons list
 minikube cache list
@@ -79,6 +86,13 @@ minikube cache add argoproj/argocd:v1.7.6
 # minikube cache add quay.io/dexidp/dex:v2.22.0 (doesn't work...)
 minikube cache add redis:5.0.8
 ```
+
+---
+
+helm dependency update 
+helm install traefik .
+kubectl port-forward $(kubectl get pods --selector "app.kubernetes.io/name=traefik" --output=name) 9000:9000
+helm uninstall traefik
 
 # random stuff
 
@@ -101,6 +115,7 @@ server {
 
 
 
+time="2020-09-26T18:52:40Z" level=error msg="The ACME resolver \"letsencrypt\" is skipped from the resolvers list because: unable to get ACME account: open acme.json: read-only file system"
 
 
 -------------------------
@@ -143,3 +158,27 @@ spec:
         backend:
           serviceName: web
           servicePort: 8080
+
+
+
+kind: Ingress
+apiVersion: extensions/v1beta1
+metadata:
+  name: helloworld-ingress
+  annotations:
+    kubernetes.io/ingress.class: traefik
+    traefik.ingress.kubernetes.io/router.tls: "true"
+    traefik.ingress.kubernetes.io/router.tls.certresolver: default
+spec:
+  rules:
+    - host: helloworld.com
+      http:
+        paths:
+          - path: /helloworld
+            backend:
+              serviceName: helloworld-service
+              servicePort: 8080
+
+dashboard:
+  enabled: true
+  domain: traefik-ui.minikube

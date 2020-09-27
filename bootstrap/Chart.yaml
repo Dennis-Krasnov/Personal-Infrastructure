@@ -9,3 +9,8 @@ sources:
 maintainers:
   - name: Dennis Krasnov
     url: https://krasnov.dev
+
+dependencies:
+  - name: traefik
+    version: 9.3.0
+    repository: https://helm.traefik.io/traefik

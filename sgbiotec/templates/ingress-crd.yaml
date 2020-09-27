@@ -1,0 +1,14 @@
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: simpleingressroute
+  namespace: default
+spec:
+  entryPoints:
+    - web
+  routes:
+  - match: Host(`tmp2.helloworld.com`) && PathPrefix(`/notls`)
+    kind: Rule
+    services:
+    - name: guestbook-ui
+      port: 8080
