@@ -4,23 +4,14 @@ metadata:
   name: portfolio-ingress
 spec:
   entryPoints:
+    - web
     - websecure
   routes:
-  # - match: Host(`krasnov.dev`) || Host(`denniskrasnov.com`)
-  #   kind: Rule
-  #   services:
-  #   - name: portfolio-web
-  #     namespace: portfolio
-  #     port: 80
-  #   middlewares:
-  #   - name: portfolio-redirect
-  - match: Host(`krasnov.dev`)
+  - match: Host(`krasnov.dev`) || Host(`denniskrasnov.com`)
     kind: Rule
     services:
     - name: portfolio-web
       namespace: portfolio
       port: 80
-  - match: Host(`denniskrasnov.com`)
-    kind: Rule
     middlewares:
     - name: portfolio-redirect
