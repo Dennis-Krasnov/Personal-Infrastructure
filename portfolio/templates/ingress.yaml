@@ -14,5 +14,3 @@ spec:
       port: 80
     middlewares:
     - name: portfolio-redirect
-  # tls:
-  #   certResolver: letsencrypt
