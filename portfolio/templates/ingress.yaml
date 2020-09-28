@@ -4,7 +4,7 @@ metadata:
   name: portfolio-ingress
 spec:
   entryPoints:
-    - web # Required to redirect from HTTP denniskrasnov.com
+    # - web # Required to redirect from HTTP denniskrasnov.com
     - websecure
   routes:
   - match: Host(`krasnov.dev`)
