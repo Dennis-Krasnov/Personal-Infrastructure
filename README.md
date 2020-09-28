@@ -31,12 +31,8 @@ virt-host-validate
 
 ```bash
 # Start local cluster
-# minikube start --driver=virtualbox --cpus 4 --memory 8192
+minikube start
 minikube addons enable ingress
-
-# Configure private image repository - https://www.digitalocean.com/docs/images/container-registry/how-to/use-registry-docker-kubernetes/
-doctl registry kubernetes-manifest | kubectl apply -f -
-kubectl patch serviceaccount default -p '{"imagePullSecrets": [{"name": "registry-krasnov"}]}'
 
 # Create secrets
 kubectl create namespace ingress-controller
@@ -46,9 +42,7 @@ kubectl -n ingress-controller get secret traefik -o jsonpath="{.data.DO_AUTH_TOK
 # Install Argo CD
 kubectl create namespace argocd
 kubectl apply -n argocd -f argocd-install.yaml
-
-# Wait until Argo CD starts
-watch -n5 -d "kubectl get pods -A"
+kubectl wait -n argocd --for=condition=ready pod -l app.kubernetes.io/name=argocd-server
 
 # Log into Argo CD
 # ANOTHER TAB: kubectl port-forward svc/argocd-server -n argocd 8088:80
@@ -64,12 +58,20 @@ argocd app create bootstrap \
   --dest-server https://kubernetes.default.svc \
   --dest-namespace default
 argocd app sync bootstrap
+argocd app wait bootstrap
 argocd app sync ingress-controller
+argocd app wait ingress-controller
 kubectl apply -n argocd -f argocd-dashboard-ingress.yaml
 
-# Sync specific apps
-argocd app sync sgbiotec
-argocd app wait sgbiotec
+for app in sgbiotec portfolio; do
+  # Configure imagePullSecrets from private image repository
+  kubectl create namespace $app
+  doctl registry kubernetes-manifest --namespace $app | kubectl apply -f -
+  kubectl patch serviceaccount default -p '{"imagePullSecrets": [{"name": "registry-krasnov"}]}' -n $app
+
+  # Sync application
+  argocd app sync $app
+done
 
 # Update /etc/hosts
 LOAD_BALANCER_IP=$(kgs -n ingress-controller ingress-controller-traefik -o json | jq -r ".status.loadBalancer.ingress[0].ip")
@@ -148,8 +150,7 @@ server {
 
 
 
-time="2020-09-26T18:52:40Z" level=error msg="The ACME resolver \"letsencrypt\" is skipped from the resolvers list because: unable to get ACME account: open acme.json: read-only file system"
-
+watch -n5 -d "kubectl get pods -A"
 
 -------------------------
 
