@@ -28,7 +28,3 @@ traefik:
     - "--certificatesresolvers.letsencrypt.acme.dnschallenge"
     - "--certificatesresolvers.letsencrypt.acme.dnschallenge.provider=digitalocean"
     # - "--certificatesresolvers.letsencrypt.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory"
-
-    # Global HTTP -> HTTPS redirect
-    # - "--entrypoints.web.http.redirections.entryPoint.to=websecure"
-    - "--entrypoints.websecure.http.tls.certResolver=letsencrypt"
