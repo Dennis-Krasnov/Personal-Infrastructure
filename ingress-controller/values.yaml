@@ -30,5 +30,5 @@ traefik:
     # - "--certificatesresolvers.letsencrypt.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory"
 
     # Global HTTP -> HTTPS redirect
-    - "--entrypoints.web.http.redirections.entryPoint.to=websecure"
+    # - "--entrypoints.web.http.redirections.entryPoint.to=websecure"
     - "--entrypoints.websecure.http.tls.certResolver=letsencrypt"
