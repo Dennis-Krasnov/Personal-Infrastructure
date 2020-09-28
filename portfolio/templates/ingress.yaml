@@ -7,22 +7,13 @@ spec:
     - web # Required to redirect from HTTP denniskrasnov.com
     - websecure
   routes:
-  # - match: Host(`krasnov.dev`) || Host(`denniskrasnov.com`)
-  #   kind: Rule
-  #   services:
-  #   - name: portfolio-web
-  #     namespace: portfolio
-  #     port: 80
-  #   middlewares:
-  #   - name: portfolio-redirect
-  - match: Host(`krasnov.dev`)
+  # Can't have match with empty services, therefore must combine hosts
+  - match: Host(`krasnov.dev`) || Host(`denniskrasnov.com`)
     kind: Rule
     services:
     - name: portfolio-web
       namespace: portfolio
       port: 80
-  - match: Host(`denniskrasnov.com`)
-    kind: Rule
     middlewares:
     - name: portfolio-redirect
   tls:
